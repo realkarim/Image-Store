@@ -47,6 +47,9 @@ public class SearchFragment extends Fragment implements SearchContract.View, Edi
     @BindInt(R.integer.recycler_view_item_width)
     int recycler_view_item_width;
 
+    // presenter
+    SearchPresenter presenter;
+
     RecyclerView.LayoutManager mLayoutManager;
     SearchImageRecyclerViewAdapter searchImageRecyclerViewAdapter;
 
@@ -55,6 +58,8 @@ public class SearchFragment extends Fragment implements SearchContract.View, Edi
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         ButterKnife.bind(this, view);
+
+        presenter = new SearchPresenter(getActivity(), this);
 
         // get screen width to calculate number of columns
         WindowManager wm = (WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE);
@@ -103,7 +108,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Edi
         imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
 
         // search
-        showMessage("Search " + searchBox.getText());
+        presenter.getImages(0, 0, searchBox.getText().toString());
     }
 
     private int pxToDp(int px) {

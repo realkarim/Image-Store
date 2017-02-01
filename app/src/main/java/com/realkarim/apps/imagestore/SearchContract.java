@@ -14,7 +14,7 @@ public interface SearchContract {
         void showMessage(String message);
     }
 
-    interface presenter {
+    interface Presenter {
         void getImages(Integer page, Integer pageSize, String phrase);
     }
 }
