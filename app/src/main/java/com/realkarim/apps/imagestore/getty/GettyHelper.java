@@ -58,10 +58,18 @@ public class GettyHelper {
                 .appendQueryParameter("phrase", phrase)
                 .build();
 
+        final String finalURL = builtUri.toString();
+
+        // check if cached
+        if (GettyCache.isCached(finalURL)) {
+            onResponseReceived(finalURL, GettyCache.getFromCache(finalURL), gettyPageResultCallback);
+            return;
+        }
+
         // create request
         Request request = new Request.Builder()
                 .header("Api-Key", context.getString(R.string.api_Key))
-                .url(builtUri.toString())
+                .url(finalURL)
                 .build();
 
         // send request
@@ -80,34 +88,43 @@ public class GettyHelper {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                // forward response to method caller
-                final ArrayList<Image> imageArrayList = new ArrayList<Image>();
-                String responseString = response.body().string();
-                try {
-                    JSONObject jsonObject = new JSONObject(responseString);
-                    JSONArray jsonArray = jsonObject.getJSONArray("images");
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        Image image = gson.fromJson(jsonArray.getJSONObject(i).toString(), Image.class);
-                        imageArrayList.add(image);
-                    }
-                } catch (final JSONException e) {
-                    mainHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            gettyPageResultCallback.onError(e.getMessage());
-                            Log.e(TAG, "IOException: " + e.getMessage());
-                        }
-                    });
-                } finally {
-                    mainHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            gettyPageResultCallback.onResultReceived(imageArrayList);
-                        }
-                    });
-                }
+                onResponseReceived(finalURL, response.body().string(), gettyPageResultCallback);
             }
         });
 
+    }
+
+    private void onResponseReceived(String finalURL, String responseString, final GettyPageResultCallback gettyPageResultCallback) {
+        // forward response to method caller
+        final ArrayList<Image> imageArrayList = new ArrayList<Image>();
+
+        try {
+            JSONObject jsonObject = new JSONObject(responseString);
+            JSONArray jsonArray = jsonObject.getJSONArray("images");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                Image image = gson.fromJson(jsonArray.getJSONObject(i).toString(), Image.class);
+                imageArrayList.add(image);
+            }
+
+            // cache request if not already cached
+            if(!GettyCache.isCached(finalURL))
+                GettyCache.cache(finalURL, responseString);
+
+        } catch (final JSONException e) {
+            mainHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    gettyPageResultCallback.onError(e.getMessage());
+                    Log.e(TAG, "IOException: " + e.getMessage());
+                }
+            });
+        } finally {
+            mainHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    gettyPageResultCallback.onResultReceived(imageArrayList);
+                }
+            });
+        }
     }
 }
