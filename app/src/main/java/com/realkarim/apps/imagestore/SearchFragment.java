@@ -45,13 +45,13 @@ public class SearchFragment extends Fragment implements SearchContract.View, Edi
     RecyclerView imageRecyclerView;
 
     @BindInt(R.integer.recycler_view_item_width)
-    int recycler_view_item_width;
+    int recyclerViewItemWidth;
 
     // presenter
-    SearchPresenter presenter;
+    private SearchPresenter presenter;
 
-    RecyclerView.LayoutManager mLayoutManager;
-    SearchImageRecyclerViewAdapter searchImageRecyclerViewAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private SearchImageRecyclerViewAdapter searchImageRecyclerViewAdapter;
 
     @Nullable
     @Override
@@ -69,11 +69,11 @@ public class SearchFragment extends Fragment implements SearchContract.View, Edi
         int width = size.x;
 
         // use a grid layout manager
-        mLayoutManager = new GridLayoutManager(getActivity(), pxToDp(width)/recycler_view_item_width);
+        mLayoutManager = new GridLayoutManager(getActivity(), pxToDp(width)/recyclerViewItemWidth);
         imageRecyclerView.setLayoutManager(mLayoutManager);
 
         // set adapter
-        searchImageRecyclerViewAdapter = new SearchImageRecyclerViewAdapter();
+        searchImageRecyclerViewAdapter = new SearchImageRecyclerViewAdapter(getActivity());
         imageRecyclerView.setAdapter(searchImageRecyclerViewAdapter);
 
         searchBox.setOnEditorActionListener(this);
@@ -83,7 +83,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Edi
 
     @Override
     public void onPageReceived(ArrayList arrayList) {
-
+        searchImageRecyclerViewAdapter.addPage(arrayList);
     }
 
     @Override
@@ -101,14 +101,14 @@ public class SearchFragment extends Fragment implements SearchContract.View, Edi
         return false;
     }
 
-    public void search(){
+    private void search(){
         // hide keyboard if still visible
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
                 INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
 
         // search
-        presenter.getImages(0, 0, searchBox.getText().toString());
+        presenter.getImages(1, 10, searchBox.getText().toString());
     }
 
     private int pxToDp(int px) {
