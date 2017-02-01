@@ -16,14 +16,20 @@ import java.util.ArrayList;
  * Created by Karim Mostafa on 2/1/17.
  */
 
-public class SearchImageRecyclerViewAdapter extends RecyclerView.Adapter<SearchImageRecyclerViewAdapter.ViewHolder>{
+public abstract class SearchImageRecyclerViewAdapter extends RecyclerView.Adapter<SearchImageRecyclerViewAdapter.ViewHolder> {
 
     private ArrayList<Image> imageLists;
     private Context context;
 
-    public SearchImageRecyclerViewAdapter(Context context){
+    private Integer page;
+    private Integer pageSize;
+
+    public SearchImageRecyclerViewAdapter(Context context) {
         imageLists = new ArrayList<>();
         this.context = context;
+
+        page = 1;
+        pageSize = 10;
     }
 
     @Override
@@ -42,6 +48,13 @@ public class SearchImageRecyclerViewAdapter extends RecyclerView.Adapter<SearchI
                 .error(R.drawable.photo_not_available)
                 .placeholder(R.drawable.loading)
                 .into(holder.image);
+
+        // load more when reaching the end of the list
+        if (position == imageLists.size() - 1) {
+            page++;
+            pageSize *= 2;
+            loadMore(page, pageSize);
+        }
     }
 
     @Override
@@ -58,8 +71,17 @@ public class SearchImageRecyclerViewAdapter extends RecyclerView.Adapter<SearchI
         }
     }
 
-    public void addPage(ArrayList<Image> newPage){
+    public void addPage(ArrayList<Image> newPage) {
         imageLists.addAll(newPage);
         this.notifyDataSetChanged();
     }
+
+    public void clearList(){
+        imageLists.clear();
+        page = 1;
+        pageSize = 10;
+        // notifyDataSetChanged() will be called when the next page is added
+    }
+
+    public abstract void loadMore(Integer nextPage, Integer nextPageSize);
 }

@@ -53,6 +53,9 @@ public class SearchFragment extends Fragment implements SearchContract.View, Edi
     private RecyclerView.LayoutManager mLayoutManager;
     private SearchImageRecyclerViewAdapter searchImageRecyclerViewAdapter;
 
+    private Integer page = 1;
+    private Integer pageSize = 10;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -73,7 +76,14 @@ public class SearchFragment extends Fragment implements SearchContract.View, Edi
         imageRecyclerView.setLayoutManager(mLayoutManager);
 
         // set adapter
-        searchImageRecyclerViewAdapter = new SearchImageRecyclerViewAdapter(getActivity());
+        searchImageRecyclerViewAdapter = new SearchImageRecyclerViewAdapter(getActivity()) {
+            @Override
+            public void loadMore(Integer nextPage, Integer nextPageSize) {
+                page = nextPage;
+                pageSize = nextPageSize;
+                search();
+            }
+        };
         imageRecyclerView.setAdapter(searchImageRecyclerViewAdapter);
 
         searchBox.setOnEditorActionListener(this);
@@ -95,6 +105,11 @@ public class SearchFragment extends Fragment implements SearchContract.View, Edi
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
         switch (actionId){
             case EditorInfo.IME_ACTION_SEARCH:
+                // clear current list
+                searchImageRecyclerViewAdapter.clearList();
+                page = 1;
+                pageSize = 10;
+                // search new keyword
                 search();
                 break;
         }
@@ -102,13 +117,18 @@ public class SearchFragment extends Fragment implements SearchContract.View, Edi
     }
 
     private void search(){
+        if(searchBox.getText().toString() == null){
+            showMessage("Please enter a keyword");
+            return;
+        }
+
         // hide keyboard if still visible
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
                 INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
 
         // search
-        presenter.getImages(1, 10, searchBox.getText().toString());
+        presenter.getImages(page, pageSize, searchBox.getText().toString());
     }
 
     private int pxToDp(int px) {
