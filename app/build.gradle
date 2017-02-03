@@ -53,4 +53,7 @@ dependencies {
 
     // Mockito
     testCompile "org.mockito:mockito-core:2.0.57-beta"
+    
+    // Robolectric
+    testCompile "org.robolectric:robolectric:3.1.2"
 }

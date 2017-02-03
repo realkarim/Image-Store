@@ -16,7 +16,7 @@ import okhttp3.OkHttpClient;
  * Created by Karim Mostafa on 2/3/17.
  */
 @Module
-class AppModule {
+public class AppModule {
     Application mApplication;
 
     public AppModule(Application application) {
