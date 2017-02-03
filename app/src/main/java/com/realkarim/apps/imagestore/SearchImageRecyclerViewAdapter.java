@@ -117,7 +117,7 @@ public abstract class SearchImageRecyclerViewAdapter extends RecyclerView.Adapte
                     ((ViewGroup) v.getParent()), false);
 
             // create PopupWindow
-            final PopupWindow pw = new PopupWindow(
+            pw = new PopupWindow(
                     layout,
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT, true);
