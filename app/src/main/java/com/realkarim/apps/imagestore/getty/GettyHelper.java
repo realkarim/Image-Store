@@ -1,5 +1,6 @@
 package com.realkarim.apps.imagestore.getty;
 
+import android.app.Application;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
@@ -17,6 +18,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -31,17 +34,17 @@ public class GettyHelper {
 
     static private String TAG = GettyHelper.class.getName();
 
-    private OkHttpClient okHttpClient;
-    private Context context;
-    private Gson gson;
-    private Handler mainHandler;
+    @Inject
+    OkHttpClient okHttpClient;
+    @Inject
+    Application application;
+    @Inject
+    Gson gson;
+    @Inject
+    Handler mainHandler;
 
-
-    public GettyHelper(Context context) {
-        this.context = context;
-        okHttpClient = new OkHttpClient();
-        gson = new Gson();
-        mainHandler = new Handler(Looper.getMainLooper());
+    @Inject
+    public GettyHelper() {
     }
 
     public void requestImagePage(Integer page, Integer pageSize, String phrase, final GettyPageResultCallback gettyPageResultCallback) {
@@ -50,7 +53,7 @@ public class GettyHelper {
         gettyPageResultCallback.onStartRequest();
 
         // create full url
-        String baseURL = context.getString(R.string.search_url);
+        String baseURL = application.getString(R.string.search_url);
         Uri builtUri = Uri.parse(baseURL)
                 .buildUpon()
                 .appendQueryParameter("page", page.toString())
@@ -68,7 +71,7 @@ public class GettyHelper {
 
         // create request
         Request request = new Request.Builder()
-                .header("Api-Key", context.getString(R.string.api_Key))
+                .header("Api-Key", application.getString(R.string.api_Key))
                 .url(finalURL)
                 .build();
 

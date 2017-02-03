@@ -9,20 +9,26 @@ import com.realkarim.apps.imagestore.getty.GettyPageResultCallback;
 
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
 /**
  * Created by Karim Mostafa on 1/31/17.
  */
 
 public class SearchPresenter implements SearchContract.Presenter {
 
-    private Context context;
     private SearchContract.View view;
+
+    @Inject
     GettyHelper gettyHelper;
 
-    SearchPresenter(Context context, SearchContract.View view){
-        this.context = context;
+    @Inject
+    SearchPresenter(){
+
+    }
+
+    public void setView(SearchContract.View view){
         this.view = view;
-        gettyHelper = new GettyHelper(context);
     }
 
     @Override

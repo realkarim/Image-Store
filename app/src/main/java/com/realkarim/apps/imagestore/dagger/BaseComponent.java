@@ -1,0 +1,16 @@
+package com.realkarim.apps.imagestore.dagger;
+
+import com.realkarim.apps.imagestore.SearchFragment;
+
+import javax.inject.Singleton;
+
+import dagger.Component;
+
+/**
+ * Created by Karim Mostafa on 2/3/17.
+ */
+@Singleton
+@Component(modules = {AppModule.class})
+public interface BaseComponent {
+    void inject(SearchFragment searchFragment);
+}
